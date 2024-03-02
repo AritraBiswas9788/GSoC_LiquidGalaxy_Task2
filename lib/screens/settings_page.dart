@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lg_connection/components/connection_flag.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// TODO 5: Import the ssh file and the dartssh2 package
+import 'package:lg_connection/connections/ssh.dart';
+import 'package:dartssh2/dartssh2.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -12,24 +13,21 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool connectionStatus = false;
-  // TODO 8: Declare SSH Instance
-  // late SSH ssh;
+  late SSH ssh;
 
   Future<void> _connectToLG() async {
-    // TODO 10: Connect to Liquid Galaxy Rig
-    // bool? result = await ssh.connectToLG();
-    // setState(() {
-    //   connectionStatus = result!;
-    // });
+    bool? result = await ssh.connectToLG();
+    setState(() {
+      connectionStatus = result!;
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    // TODO 9: Initialize SSH Instance and uncomment _connectToLG()
-    // ssh = SSH();
+    ssh = SSH();
     _loadSettings();
-    // _connectToLG();
+    _connectToLG();
   }
 
   final TextEditingController _ipController = TextEditingController();
@@ -86,179 +84,202 @@ class _SettingsPageState extends State<SettingsPage> {
         Navigator.pop(context, connectionStatus);
         return true;
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Connection Settings'),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: ConnectionFlag(
-                    status: connectionStatus,
-                  )),
-              TextField(
-                controller: _ipController,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.computer),
-                  labelText: 'IP address',
-                  hintText: 'Enter Master IP',
-                  border: OutlineInputBorder(),
+      child: Theme(
+        data: ThemeData.dark(useMaterial3: true),
+        child: Scaffold(
+          backgroundColor: Colors.deepPurple.shade300,
+          appBar: AppBar(
+            title: const Text('Connection Settings'),
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(3.0, 16.0, 16.0, 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ConnectionFlag(
+                          status: connectionStatus, backgroundColor: Colors.white54,
+                        ),
+                      ],
+                    )
                 ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _usernameController,
-                keyboardType: TextInputType.text,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  labelText: 'LG Username',
-                  hintText: 'Enter your username',
-                  border: OutlineInputBorder(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                  child: TextFormField(
+                    style: const TextStyle(color: Colors.white),
+                    controller: _ipController,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.computer),
+                      labelText: 'IP address',
+                      labelStyle: TextStyle(color: Colors.white),
+                      hintStyle: TextStyle(color: Colors.white54),
+                      prefixIconColor: Colors.white,
+                      fillColor: Colors.white,
+                      focusColor: Colors.white,
+                      enabledBorder:OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white)
+                      ),
+                      hintText: 'Enter Master IP',
+
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white)
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.lock),
-                  labelText: 'LG Password',
-                  hintText: 'Enter your password',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                  child: TextField(
+                    controller: _usernameController,
+                    style: const TextStyle(color: Colors.white),
+                    keyboardType: TextInputType.text,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.person),
+                      labelText: 'LG Username',
+                      hintText: 'Enter your username',
+                      labelStyle: TextStyle(color: Colors.white),
+                      hintStyle: TextStyle(color: Colors.white54),
+                      prefixIconColor: Colors.white,
+                      fillColor: Colors.white,
+                      focusColor: Colors.white,
+                      enabledBorder:OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white)
+                      ),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                 ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _sshPortController,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.settings_ethernet),
-                  labelText: 'SSH Port',
-                  hintText: '22',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                  child: TextField(
+                    controller: _passwordController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.lock),
+                      labelText: 'LG Password',
+                      hintText: 'Enter your password',
+                      labelStyle: TextStyle(color: Colors.white),
+                      hintStyle: TextStyle(color: Colors.white54),
+                      prefixIconColor: Colors.white,
+                      fillColor: Colors.white,
+                      focusColor: Colors.white,
+                      enabledBorder:OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white)
+                      ),
+                      border: OutlineInputBorder(),
+                    ),
+                    obscureText: true,
+                  ),
                 ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _rigsController,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.memory),
-                  labelText: 'No. of LG rigs',
-                  hintText: 'Enter the number of rigs',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                  child: TextField(
+                    controller: _sshPortController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.settings_ethernet),
+                      labelText: 'SSH Port',
+                      hintText: '22',
+                      labelStyle: TextStyle(color: Colors.white),
+                      hintStyle: TextStyle(color: Colors.white54),
+                      prefixIconColor: Colors.white,
+                      fillColor: Colors.white,
+                      focusColor: Colors.white,
+                      enabledBorder:OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white)
+                      ),
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
                 ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextButton(
-                style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.green),
-                  shape: MaterialStatePropertyAll(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(50),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                  child: TextField(
+                    controller: _rigsController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.memory),
+                      labelText: 'No. of LG rigs',
+                      hintText: 'Enter the number of rigs',
+                      labelStyle: TextStyle(color: Colors.white),
+                      hintStyle: TextStyle(color: Colors.white54),
+                      prefixIconColor: Colors.white,
+                      fillColor: Colors.white,
+                      focusColor: Colors.white,
+                      enabledBorder:OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white)
+                      ),
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                TextButton(
+                  style: const ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(Colors.green),
+                    shape: MaterialStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(50),
+                        ),
+                      ),
+                    ),
+                  ),
+                  onPressed: () async {
+                    await _saveSettings();
+                    SSH ssh = SSH();
+                    bool? result = await ssh.connectToLG();
+                    if (result == true) {
+                      setState(() {
+                        connectionStatus = true;
+                      });
+                      print('Connected to LG successfully');
+                    }
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.cast,
+                            color: Colors.white,
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Text(
+                            'CONNECT TO LG',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        ],
                       ),
                     ),
                   ),
                 ),
-                onPressed: () async {
-                  await _saveSettings();
-                  // TODO 6: Initalize SSH Instance and call connectToLG() function
-                  // SSH ssh = SSH();
-                  // bool? result = await ssh.connectToLG();
-                  // if (result == true) {
-                  //   setState(() {
-                  //     connectionStatus = true;
-                  //   });
-                  //   print('Connected to LG successfully');
-                  // }
-                },
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.cast,
-                          color: Colors.white,
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Text(
-                          'CONNECT TO LG',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+                const SizedBox(
+                  height: 20,
                 ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              TextButton(
-                style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.green),
-                  shape: MaterialStatePropertyAll(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(50),
-                      ),
-                    ),
-                  ),
-                ),
-                onPressed: () async {
-                  // TODO 7: Initialize SSH and execute the demo command and test
-                  // SSH ssh =
-                  //     SSH(); //Re-initialization of the SSH instance to avoid errors for beginners
-                  // await ssh.connectToLG();
-                  // SSHSession? execResult = await ssh.execute();
-                  // if (execResult != null) {
-                  //   print('Command executed successfully');
-                  // } else {
-                  //   print('Failed to execute command');
-                  // }
-                },
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.cast,
-                          color: Colors.white,
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Text(
-                          'SEND COMMAND TO LG',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            ],
+              ],
+            ),
           ),
         ),
       ),
