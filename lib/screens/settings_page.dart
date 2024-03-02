@@ -96,17 +96,20 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        ConnectionFlag(
-                          status: connectionStatus, backgroundColor: Colors.white54,
-                        ),
-                      ],
-                    )
-                ),
+                    Padding(
+                        padding: const EdgeInsets.fromLTRB(3.0, 0.0, 16.0, 16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ConnectionFlag(
+                              status: connectionStatus, backgroundColor: Colors.white54,
+                            ),
+                            Image(image: AssetImage('assets/logo.png'),height: 75.0,width: 95.0,),
+                          ],
+                        )
+                    ),
+
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
                   child: TextFormField(

@@ -47,8 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.deepPurple.shade300,
-        /*appBar: AppBar(
+          backgroundColor: Colors.deepPurple.shade300,
+          /*appBar: AppBar(
           title: const Text('LG Connection'),
           actions: <Widget>[
             IconButton(
@@ -60,238 +60,243 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),*/
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
                 padding: const EdgeInsets.only(top: 10, left: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ConnectionFlag(
-                      status: connectionStatus,
-                      backgroundColor: Colors.deepPurple.shade400,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 20.0, 0.0),
-                      child: IconButton(
-                          onPressed: () async {
-                            await Navigator.pushNamed(context, '/settings');
-                            _connectToLG();
-                          },
-                          icon: const Icon(
-                            Icons.settings,
-                            color: Colors.white,
-                            size: 45.0,
-                          )),
-                    )
+                  ConnectionFlag(
+                  status: connectionStatus,
+                  backgroundColor: Colors.deepPurple.shade400,
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 20.0, 0.0),
+                  child: Row(
+                      children: [
+                  Image(image: AssetImage('assets/logo.png'),height: 75.0,width: 95.0,),
+                  SizedBox(width: 20.0),
+                  IconButton(
+                      onPressed: () async {
+                        await Navigator.pushNamed(context, '/settings');
+                        _connectToLG();
+                      },
+                      icon: const Icon(
+                        Icons.settings,
+                        color: Colors.white,
+                        size: 45.0,
+                      )),
                   ],
-                )),
+                ),
+              )
+            ],
+          )),
+      Expanded(
+        child: Row(
+          children: [
             Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GalaxyButton(
-                      colour: Colors.deepPurple.shade300,
-                      onPress: () async {
-                        if (!connectionStatus) showError();
-                        await showDialog(
-                          useRootNavigator: false,
-                            context: context,
-                            builder: (BuildContext context) {
-                              return
-                                AlertDialog(
-                                  title: const Row(
-                                    children: [
-                                      Icon(
-                                        Icons.warning,
-                                        color: Colors.red,
-                                      ),
-                                      SizedBox(width: 0.0),
-                                      Text('Warning!'),
-                                    ],
-                                  ),
-                                  content: const Text(
-                                      'This will reboot all the machines in the Liquid galaxy Rig.'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text(
-                                        'CANCEL',
-                                        style: TextStyle(color: Colors.grey),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () async {
-
-                                        await ssh.rebootLG(context);
-                                        print('successfully rebooted');
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text(
-                                        'REBOOT',
-                                        style: TextStyle(color: Colors.blue),
-                                      ),
-                                    ),
-                                  ],
-                              );
-                            });
-                      },
-                      cardChild: const Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.reset_tv,
-                                color: Colors.white, size: 55.0),
-                            SizedBox(width: 25.0),
-                            Text(
-                              'REBOOT LG',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.w700),
+              child: GalaxyButton(
+                colour: Colors.deepPurple.shade300,
+                onPress: () async {
+                  if (!connectionStatus) showError();
+                  await showDialog(
+                      useRootNavigator: false,
+                      context: context,
+                      builder: (BuildContext context) {
+                        return
+                          AlertDialog(
+                            title: const Row(
+                              children: [
+                                Icon(
+                                  Icons.warning,
+                                  color: Colors.red,
+                                ),
+                                SizedBox(width: 0.0),
+                                Text('Warning!'),
+                              ],
                             ),
-                          ],
-                        ),
+                            content: const Text(
+                                'This will reboot all the machines in the Liquid galaxy Rig.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  'CANCEL',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  await ssh.rebootLG(context);
+                                  print('successfully rebooted');
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  'REBOOT',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
+                              ),
+                            ],
+                          );
+                      });
+                },
+                cardChild: const Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.reset_tv,
+                          color: Colors.white, size: 55.0),
+                      SizedBox(width: 25.0),
+                      Text(
+                        'REBOOT LG',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 40,
+                            fontWeight: FontWeight.w700),
                       ),
-                    ),
+                    ],
                   ),
-                  Expanded(
-                    child: GalaxyButton(
-                      colour: Colors.deepPurple.shade300,
-                      onPress: () async {
-                        if (!connectionStatus) showError();
-                        await _determinePosition();
-                        await ssh.flyTo(context, double.parse(lat),
-                            double.parse(long), 7934.28515625, 0, 0);
-                        print('execution finished');
-                      },
-                      cardChild: const Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.home_work,
-                                color: Colors.white, size: 55.0),
-                            SizedBox(width: 25.0),
-                            Text(
-                              'HOME-CITY',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                ],
+                ),
               ),
             ),
-            //
             Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GalaxyButton(
-                      onPress: () async {
-                        if (!connectionStatus) showError();
-                        /*await _determinePosition();
+              child: GalaxyButton(
+                colour: Colors.deepPurple.shade300,
+                onPress: () async {
+                  if (!connectionStatus) showError();
+                  await _determinePosition();
+                  await ssh.flyTo(context, double.parse(lat),
+                      double.parse(long), 7934.28515625, 0, 0);
+                  print('execution finished');
+                },
+                cardChild: const Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.home_work,
+                          color: Colors.white, size: 55.0),
+                      SizedBox(width: 25.0),
+                      Text(
+                        'HOME-CITY',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 40,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+      //
+      Expanded(
+        child: Row(
+          children: [
+            Expanded(
+              child: GalaxyButton(
+                onPress: () async {
+                  if (!connectionStatus) showError();
+                  /*await _determinePosition();
                           await _getCity(locator.latitude, locator.longitude);
                           await ssh.flyTo(context, double.parse(lat), double.parse(long), 7934.28515625, 0, 0);
                           await ssh.flyToOrbit(context, double.parse(lat), double.parse(long), 7934.28515625, 0, 10);
                           //ssh.startOrbit(context);
                           print("Orbit Succeeded");*/
-                        await _determinePosition();
-                        String str = KMLMakers.buildTourOrbit(double.parse(lat),
-                            double.parse(long), 7934.28515625, 0, 0);
-                        File file = await ssh.makeFile('Orbit', str);
-                        await ssh.kmlFileUpload(context, file, 'Orbit');
-                        print("uploaded successfully");
-                        await ssh.runKml(context, 'Orbit');
-                        print("KML RAN");
-                        await ssh.startOrbit(context);
-                        /*if (!mounted) {
+                  await _determinePosition();
+                  String str = KMLMakers.buildTourOrbit(double.parse(lat),
+                      double.parse(long), 7934.28515625, 0, 0);
+                  File file = await ssh.makeFile('Orbit', str);
+                  await ssh.kmlFileUpload(context, file, 'Orbit');
+                  print("uploaded successfully");
+                  await ssh.runKml(context, 'Orbit');
+                  print("KML RAN");
+                  await ssh.startOrbit(context);
+                  /*if (!mounted) {
                             return;
                           }*/
-                        /*for(int i =0; i<=str.length-100;i+=100)
+                  /*for(int i =0; i<=str.length-100;i+=100)
                             {
                               print(str.substring(i,i+100));
                             }*/
-                      },
-                      cardChild: const Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.my_location,
-                                color: Colors.white, size: 55.0),
-                            SizedBox(width: 25.0),
-                            Text(
-                              'ORBIT-HOME-CITY',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
+                },
+                cardChild: const Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.my_location,
+                          color: Colors.white, size: 55.0),
+                      SizedBox(width: 25.0),
+                      Text(
+                        'ORBIT-HOME-CITY',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 40,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                      colour: Colors.deepPurple.shade300,
-                    ),
+                    ],
                   ),
-                  Expanded(
-                    child: GalaxyButton(
-                      colour: Colors.deepPurple.shade300,
-                      onPress: () async {
-                        if (!connectionStatus) showError();
-                        await _determinePosition();
-                        String imgLink =
-                            "https://raw.githubusercontent.com/AritraBiswas9788/QuickAccessFiles/main/GithubAvatar.jpg";
-                        String balloonKml = KMLMakers.orbitBalloon(
-                            double.parse(lat),
-                            double.parse(long),
-                            7934.28515625,
-                            0,
-                            10,
-                            "Aritra Biswas",
-                            imgLink,
-                            city);
-                        int rightMostVM = (ssh.sendRigs() ~/ 2) + 1;
-                        print("VM: $rightMostVM");
-                        await ssh.renderInSlave(
-                            context, rightMostVM, balloonKml);
-                        //await ssh.setRefresh(context);
-                        print("RENDER COMMAND COMPLETED");
-                      },
-                      cardChild: const Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.settings_ethernet,
-                                color: Colors.white, size: 55.0),
-                            SizedBox(width: 25.0),
-                            Text(
-                              'HTML-BUBBLE',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
+                ),
+                colour: Colors.deepPurple.shade300,
+              ),
+            ),
+            Expanded(
+              child: GalaxyButton(
+                colour: Colors.deepPurple.shade300,
+                onPress: () async {
+                  if (!connectionStatus) showError();
+                  await _determinePosition();
+                  String imgLink =
+                      "https://raw.githubusercontent.com/AritraBiswas9788/QuickAccessFiles/main/GithubAvatar.jpg";
+                  String balloonKml = KMLMakers.orbitBalloon(
+                      double.parse(lat),
+                      double.parse(long),
+                      7934.28515625,
+                      0,
+                      10,
+                      "Aritra Biswas",
+                      imgLink,
+                      city);
+                  int rightMostVM = (ssh.sendRigs() ~/ 2) + 1;
+                  print("VM: $rightMostVM");
+                  await ssh.renderInSlave(
+                      context, rightMostVM, balloonKml);
+                  //await ssh.setRefresh(context);
+                  print("RENDER COMMAND COMPLETED");
+                },
+                cardChild: const Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.settings_ethernet,
+                          color: Colors.white, size: 55.0),
+                      SizedBox(width: 25.0),
+                      Text(
+                        'HTML-BUBBLE',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 40,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ],
         ),
       ),
+      ],
+    ),)
+    ,
     );
   }
 
@@ -340,10 +345,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _getCity(double latitude, double longitude) async {
     List<Placemark> placemarks =
-        await placemarkFromCoordinates(latitude, longitude);
+    await placemarkFromCoordinates(latitude, longitude);
     // print(placemarks.toString());
     city =
-        placemarks[0].locality != null ? placemarks[0].locality! : "not found";
+    placemarks[0].locality != null ? placemarks[0].locality! : "not found";
   }
 
   void showError() {
